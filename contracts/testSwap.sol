@@ -37,7 +37,7 @@ contract testSwap {
         path[0] = _tokenIn; // DAI
         path[1] = _tokenOut; // WETH
         
-
+        
         // Calculating the amount of tokens we should be exptecting on doing a swap/amountOut
         uint256[] memory amountsExpected = 
                         IUniswapV2Router(UNISWAP_V2_ROUTER).getAmountsOut(
@@ -54,7 +54,6 @@ contract testSwap {
             _to,
             _deadline
         );
-
     }
 }
 

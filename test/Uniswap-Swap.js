@@ -32,16 +32,17 @@ describe("Swap test", ()=> {
 
       // Create an instance of DAI token;
       const DAIContract = new ethers.Contract(DAIAddress, ERC20ABI, impersonateSigner);
-      const DAIHolderBalance = await DAIContract.balanceOf(impersonateSigner.address)
+      const DAIHolderBalance = await DAIContract.balanceOf(impersonateSigner.address);
       await DAIContract.approve(swapContract.address, DAIHolderBalance);
 
 
-      // create an Instance of WETH contract
+      // Create an Instance of WETH contract
       const WETHContract = new ethers.Contract(WETHAddress, ERC20ABI, impersonateSigner);
       const myWETHBalance = await WETHContract.balanceOf(MyAddress);
       console.log("Initial balance", ethers.utils.formatUnits(myWETHBalance.toString()));
 
-      // get the current Block
+    
+      // Get the current Block
       const latestBlock = await ethers.provider.getBlockNumber();
       const timestamp = (await ethers.provider.getBlock(latestBlock)).timestamp;
 

@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 const {BigNumber} = require("ethers");
 const {expect} = require("chai");
-const { pow } = require("../src/utils"); 
+const { pow, sendEther } = require("../src/utils"); 
 
 
 
@@ -16,11 +16,9 @@ describe("Add Liquidity", ()=> {
     // const DAIHolder = "0x5d38b4e4783e34e2301a2a36c39a03c45798c4dd";
     // const WETH_WHALE = "0xee2826453A4Fd5AfeB7ceffeEF3fFA2320081268"; <=
     // const DAI_WHALE=  "0xF977814e90dA44bFA03b6295A0616a897441aceC"; <= 
-    const TOKENS_WHALE= "0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936f0bE";
-    const SandBoxTokenAddress = "0x3845badAde8e6dFF049820680d1F14bD3903a5d0";
-    const ThetaTokenAddress = "0x3883f5e181fccaF8410FA61e12b59BAd963fb645";
-    const TOKEN_A_AMOUNT = pow(1, 18);
-    const TOKEN_B_AMOUNT = pow(1, 18);
+    const TOKENS_WHALE= "0xee2826453A4Fd5AfeB7ceffeEF3fFA2320081268";
+    const WETHAddress = "0xa117000000f279D81A1D3cc75430fAA017FA5A2e";
+    const UniSwapTokenAddress = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
 
     let LiquidityContract;
 
@@ -28,7 +26,9 @@ describe("Add Liquidity", ()=> {
         let liquidityContract = await ethers.getContractFactory("TestUniswapLiquidity");
         LiquidityContract = await liquidityContract.deploy();
         LiquidityContract.deployed();
+
     });
+
 
     it("Should add liquidity", async ()=> {
 
@@ -42,31 +42,28 @@ describe("Add Liquidity", ()=> {
 
 
         // Create an Instance of Sandbox Token Contract
-        let sandBoxTokenContract = new ethers.Contract(SandBoxTokenAddress, ERC20ABI, ImpersonateSigner);
-        let sandBoxTokenBalance = await sandBoxTokenContract.balanceOf(ImpersonateSigner.address);
-        sandBoxTokenContract.approve(LiquidityContract.address, TOKEN_A_AMOUNT);
-        console.log("Cocos Holder Balance before", ethers.utils.formatUnits(sandBoxTokenBalance.toString()));
+        let WETHContract = new ethers.Contract(WETHAddress, ERC20ABI, ImpersonateSigner);
+        let WETHContractBalance = await WETHContract.balanceOf(ImpersonateSigner.address);
+        WETHContract.approve(LiquidityContract.address, WETHContractBalance);
+        console.log("WETH balance before", ethers.utils.formatUnits(WETHContractBalance.toString()));
 
 
         // Create an Instance of Theta Token Contract
-        let ThetaTokenContract = new ethers.Contract(ThetaTokenAddress, ERC20ABI, ImpersonateSigner);
-        let ThetaTokenBalance = await ThetaTokenContract.balanceOf(ImpersonateSigner.address);
-        ThetaTokenContract.approve(LiquidityContract.address, TOKEN_B_AMOUNT);
-        console.log("Sand Box Balance before", ethers.utils.formatUnits(ThetaTokenBalance.toString()));
+        let UniSwapTokenContract = new ethers.Contract(UniSwapTokenAddress, ERC20ABI, ImpersonateSigner);
+        let UniswapBalance = await UniSwapTokenContract.balanceOf(ImpersonateSigner.address);
+        UniSwapTokenContract.approve(LiquidityContract.address, UniswapBalance);
+        console.log("Uniswap Balance before", ethers.utils.formatUnits(UniswapBalance.toString()));
 
 
         // Add liquidity
         await LiquidityContract.connect(ImpersonateSigner).addLiquidity(
-            SandBoxTokenAddress,
-            ThetaTokenAddress,
-            TOKEN_A_AMOUNT,
-            TOKEN_B_AMOUNT);
+            WETHAddress,
+            UniSwapTokenAddress,
+            WETHContractBalance,
+            UniswapBalance);
 
-    console.log("Sand Box Balance after", ethers.utils.formatUnits(ThetaTokenBalance.toString()));
-    console.log("Cocos Holder Balance after", ethers.utils.formatUnits(sandBoxTokenBalance.toString()));
-
-
-
+    console.log("Uniswap Balance after", ethers.utils.formatUnits(UniswapBalance.toString()));
+    console.log("WETH balance after", ethers.utils.formatUnits(WETHContractBalance.toString()));
 
     })
 

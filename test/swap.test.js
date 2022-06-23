@@ -29,6 +29,7 @@ describe("Swap Examples", () => {
     // We Initial tokens
     weth9 = await ethers.getContractAt("IWETH", WETH9);
     dai = await ethers.getContractAt("IERC20", DAI);
+    usdc = await ethers.getContractAt("IERC20", USDC);
     
     });
 
@@ -45,6 +46,32 @@ describe("Swap Examples", () => {
         await swapExamples.swapExactInputSingle(amountIn);
         console.log("Dai Balance : ", await dai.balanceOf(accounts[0].address));
 
+    });
+
+    // Executing swap with user conditions
+    it("swapExactOutputSingle", async ()=> {
+        const amountInMaximum = 10n ** 18n; // 1 WETH
+        const amountOut = 100n * 10n ** 18n; // 100 DAI
+
+        await weth9.deposit({value : amountInMaximum});
+        await weth9.approve(swapExamples.address, amountInMaximum);
+
+        await swapExamples.swapExactOutputSingle(amountOut, amountInMaximum);
+        
+        console.log(" Dai Balance :", await dai.balanceOf(accounts[0].address));
+    });
+
+
+    it("swapExactInputMultihop", async () => {
+
+        const wethAmountIn = 10n ** 18n;
+
+        await weth9.deposit({value : wethAmountIn});
+        await weth9.approve(swapExamples.address, wethAmountIn);
+
+        await swapExamples.swapExactInputMultihop(wethAmountIn);
+
+        console.log("Dai Balance : ", await dai.balanceOf(accounts[0].address));
     });
 
 
